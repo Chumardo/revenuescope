@@ -2,6 +2,8 @@
 
 **Revenue investigation for e-commerce analytics teams.** RevenueScope gives analysts a way to compare daily revenue with a weekday baseline, prioritize material deviations, and inspect how the gap breaks down by region, product, or channel. The Streamlit workspace uses one reproducible synthetic merchant and has no upload or sign-in flow.
 
+**[Launch Live Demo](https://revenuescope-demo.streamlit.app/)** · [GitHub repository](https://github.com/Chumardo/revenuescope)
+
 ![RevenueScope overview with the posted-day revenue series, comparable scored-day totals, and flagged dates](docs/screenshots/release/01-overview.png)
 
 ## Run the demo
@@ -46,6 +48,6 @@ python -m revenuescope.benchmark evaluate --lock output/replay-development.json 
 
 These commands produce developer-only event labels and benchmark evidence. Keep their output in the ignored `data/rebuilt/` and `output/` directories. The demo entrypoint reads the bundled snapshot and curated display evidence. See the [case study](docs/case_study.md) for the model and validation design and the [deployment guide](docs/deployment.md) for release packaging and host checks.
 
-## License decision
+## License
 
-MIT is the proposed license for the original project code and documentation. It permits broad reuse while retaining the copyright and permission notice. Confirm the license, copyright holder, and year before adding a root `LICENSE` and publishing. [MIT license text](https://opensource.org/license/mit)
+RevenueScope is available under the [MIT License](LICENSE). Copyright © 2026 chumardo.
