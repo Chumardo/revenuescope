@@ -1,0 +1,50 @@
+  .stApp { --rs-ink: #14273b; --rs-muted: #52677c; --rs-line: #d9e3eb; }
+  [data-testid="stMainBlockContainer"] { max-width: 1340px; padding: 1.6rem 2.4rem 3.5rem; }
+  [data-testid="stHeader"] { background: transparent; height: 1.45rem; }
+  .rs-masthead { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding: .15rem 0 1rem; border-bottom:1px solid var(--rs-line); }
+  .rs-wordmark { display:flex; align-items:center; gap:.72rem; font-size:1.16rem; font-weight:760; letter-spacing:-.035em; line-height:1.12; color:var(--rs-ink); }
+  .rs-wordmark small { display:block; color:var(--rs-muted); font-size:.68rem; font-weight:600; letter-spacing:.01em; margin-top:.24rem; }
+  .rs-logo { display:flex; align-items:end; justify-content:center; gap:3px; padding-bottom:10px; box-sizing:border-box; width:38px; height:38px; border-radius:10px; background:#0b645d; }
+  .rs-logo i { display:block; width:4px; height:7px; background:#fff; border-radius:1px; }
+  .rs-logo i:nth-child(2) { height:12px; }
+  .rs-logo i:nth-child(3) { height:17px; }
+  .rs-tag { flex-shrink:0; font-size:.71rem; font-weight:650; color:#244960; background:#e6eff5; border:1px solid #d8e5ef; padding:.36rem .62rem; border-radius:.35rem; }
+  .st-key-rs_page [data-testid="stButtonGroup"] { width:100%; }
+  .st-key-rs_page button { font-size:.87rem; font-weight:630; }
+  [data-testid="stHeadingWithActionElements"] h1 { font-size: clamp(1.7rem, 4.5vw, 2.32rem); letter-spacing:-.042em; padding:.15rem 0 .1rem; line-height:1.1; }
+  [data-testid="stHeadingWithActionElements"] h2 { font-size:1.3rem; letter-spacing:-.026em; }
+  [data-testid="stHeadingWithActionElements"] h3 { font-size:1.08rem; letter-spacing:-.016em; }
+  .st-key-rs_overview_chart, .st-key-rs_scope { background:#fff; border-radius:.6rem; }
+  [data-testid="stMetric"] { background:#fff; border-color:var(--rs-line); min-width:0; }
+  [data-testid="stMetricValue"] { font-variant-numeric:tabular-nums; letter-spacing:-.045em; font-size:clamp(1.27rem, 2.8vw, 1.9rem); }
+  [data-testid="stMetricLabel"] p { font-weight:650; color:#40596f; font-size:.81rem; }
+  .st-key-rs_scope [data-testid="stHorizontalBlock"], .st-key-rs_queue [data-testid="stHorizontalBlock"] { gap:.9rem; }
+  .st-key-rs_kpis [data-testid="stMetric"] { min-height:6.1rem; }
+  [data-testid="stCaptionContainer"] { opacity:1 !important; }
+  [data-testid="stCaptionContainer"], [data-testid="stCaptionContainer"] p { color:#52677c !important; }
+  .rs-comparison { width:100%; table-layout:fixed; border-collapse:separate; border-spacing:0; border:1px solid var(--rs-line); border-radius:.5rem; background:#fff; }
+  .rs-comparison th, .rs-comparison td { padding:.55rem .75rem; border-bottom:1px solid #e4edf3; vertical-align:middle; font-variant-numeric:tabular-nums; }
+  .rs-comparison th { background:#eaf1f6; color:#244960; }
+  .rs-comparison tr:last-child td { border-bottom:0; }
+  .rs-comparison th:first-child { width:50%; }
+  .rs-comparison :is(th, td):not(:first-child) { text-align:right; }
+  @media(max-width: 660px) {
+    [data-testid="stMainBlockContainer"] { padding:1.65rem 1rem 2rem; }
+    .rs-masthead { padding-bottom:.75rem; }
+    .st-key-rs_page button { padding:.32rem .48rem; font-size:.75rem; }
+    .st-key-rs_scope [data-testid="stHorizontalBlock"],
+    .st-key-rs_queue [data-testid="stHorizontalBlock"],
+    .st-key-rs_detail_kpis [data-testid="stHorizontalBlock"],
+    .st-key-rs_eval_kpis [data-testid="stHorizontalBlock"],
+    .st-key-rs_kpis [data-testid="stHorizontalBlock"] { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:.55rem; }
+    .st-key-rs_scope [data-testid="stColumn"],
+    .st-key-rs_queue [data-testid="stColumn"],
+    .st-key-rs_detail_kpis [data-testid="stColumn"],
+    .st-key-rs_eval_kpis [data-testid="stColumn"],
+    .st-key-rs_kpis [data-testid="stColumn"] { width:100%; min-width:0; }
+    .st-key-rs_detail_kpis [data-testid="stColumn"]:last-child,
+    .st-key-rs_eval_kpis [data-testid="stColumn"]:last-child { grid-column:1/-1; }
+    .st-key-rs_kpis [data-testid="stMetric"] { padding:.6rem .7rem; min-height:5rem; }
+    [data-testid="stMetricLabel"] p { white-space:normal; }
+    .rs-comparison th, .rs-comparison td { font-size:.76rem; padding:.45rem .42rem; }
+  }
