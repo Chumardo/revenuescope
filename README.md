@@ -1,6 +1,6 @@
 # RevenueScope
 
-**Revenue investigation for e-commerce analytics teams.** RevenueScope gives analysts a way to compare daily revenue with a weekday baseline, prioritize material deviations, and inspect how the gap breaks down by region, product, or channel. The Streamlit workspace uses one reproducible synthetic merchant and has no upload or sign-in flow.
+RevenueScope helps e-commerce analysts compare daily revenue with a weekday baseline, open flagged dates, and trace how the gap breaks down by region, product, or channel. The Streamlit workspace uses one reproducible synthetic merchant and has no upload or sign-in flow.
 
 **[Launch Live Demo](https://revenuescope-demo.streamlit.app/)** · [GitHub repository](https://github.com/Chumardo/revenuescope)
 
@@ -8,7 +8,7 @@
 
 ## Run the demo
 
-Use Python 3.12 and start in the root of the prepared release tree. On Windows:
+Use Python 3.12 from the root of the Git checkout or verified release archive. On Windows, run the following commands.
 
 ```powershell
 py -3.12 -m venv .venv
@@ -20,7 +20,7 @@ On macOS or Linux, create the environment with `python3.12 -m venv .venv` and us
 
 ## Explore the workspace
 
-1. **Revenue Overview.** Compare actual and expected posted-day activity on comparable scored dates. The complete-date actual is shown separately. Select a date range or view actuals for a region, product, or channel.
+1. **Revenue Overview.** Compare actual and expected revenue on days the detector could score. A separate actual total includes all complete days. Select a date range or view actuals for a region, product, or channel.
 2. **Analyst Review Queue.** Sort flags by absolute dollar deviation, filter by direction, and open a date. A flag starts an investigation.
 3. **Investigation Detail.** Read the actual, expected, and signed gap in exact cents. Segment allocations reconcile to the overall difference. Earlier daily revenue provides context for the flag.
 4. **Evaluation.** Compare the original and locked policy on the same held-out seeds. Event precision, event recall, date-level metrics, and unmatched alerts have separate definitions.
@@ -30,6 +30,8 @@ On macOS or Linux, create the environment with `python3.12 -m venv .venv` and us
 The default **posted-day activity** view recognizes booking value on checkout day and subtracts refunds when they post. The separate **retrospective order-day** view assigns known refunds to the original purchase date at the snapshot cutoff. Both use UTC. Report dates are inclusive in the UI, while the underlying time windows use exclusive end boundaries. Monetary values reconcile in integer USD cents.
 
 The synthetic demo spans **731 dates** from January 2023 through December 2024. Posted-day activity reconciles to **$4,461,841.22**, with **675 scored dates**, **56 warmup dates**, and **31 flagged dates**. These snapshot flags are distinct from the held-out benchmark. On the locked posted-day benchmark, **7 of 15 eligible events** were detected (**46.67% event recall**), and **7 of 88 alert episodes** matched (**7.95% event precision**). The benchmark repeats five simulated event types across three held-out seeds. Unmatched dates measure review workload under those matching rules. Production performance has not been established.
+
+Both benchmark views use the original order-date event windows. An event is eligible when at least one day in its window was scored. An episode needs a flag in the expected direction inside that window to match. A refund may affect posted-day revenue only after the window ends, so the event recall measures detection within the frozen windows. See the [screening and matching rules](docs/anomaly_method.md).
 
 RevenueScope is designed for analyst investigation. The low precision, synthetic status assumptions, sparse segments, and single-merchant dataset limit operational use. Segment contributions locate portions of the gap under the chosen allocation. Confirming a cause requires independent evidence.
 

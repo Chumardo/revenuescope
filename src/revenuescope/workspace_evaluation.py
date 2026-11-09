@@ -184,7 +184,8 @@ def render_evaluation(benchmark: dict) -> None:
             card.caption(denominator)
         cards[2].metric("Unmatched alert dates", f"{counts['unmatched_alert_days']:,}", border=True)
         cards[2].caption(f"{original['counts']['unmatched_alert_days']:,} with the original detector")
-    st.caption("Three held-out seeds repeat the same five synthetic event types. The results describe this benchmark.")
+    st.caption("Three held-out seeds repeat the same five synthetic event types. Both revenue bases use the "
+               "original order-date event windows. A refund can affect posted-day revenue after its window ends.")
 
     st.subheader("Original vs. locked detector")
     st.caption("Benchmark-unmatched dates had no same-direction match in the synthetic manifest. "
@@ -196,14 +197,16 @@ def render_evaluation(benchmark: dict) -> None:
     st.markdown(
         "**Date-level** precision divides matching flag dates by all flagged dates. "
         "Recall divides by scored injected dates. **Event-level** precision divides matched alert episodes "
-        "by all alert episodes. Recall divides by eligible injected events. Consecutive same-direction flags "
-        "form one episode, and an episode can match at most one event."
+        "by all alert episodes. Recall divides by eligible injected events. An event is eligible when at least "
+        "one day in its original order-date window was scored. Consecutive same-direction flags form one "
+        "episode, and an episode can match at most one event."
     )
     st.markdown(
-        "Matches must have the expected direction within the original event window. Detection delay counts "
-        "calendar days from event start to the first matching date in the assigned episode. Zero means the "
-        "flag was available by that day's close. Severity-weighted recall weights events by the absolute "
-        "injected revenue change."
+        "A match needs a flag in the expected direction inside the original window. An alert episode entirely "
+        "outside that window cannot count toward that event's recall, even if a refund has just posted. "
+        "Detection delay counts calendar days from the window start to the first matching date in the "
+        "assigned episode. A zero-day delay means the match fell on the start date. Severity-weighted recall "
+        "uses the absolute injected revenue change attributed to the order window."
     )
     with st.expander("Results by held-out seed"):
         per_seed = []

@@ -26,7 +26,7 @@ TESTS = (
     "screening", "variance", "workspace_data", "workspace_detail", "workspace_evaluation", "workspace_ui",
 )
 FILES = tuple(sorted((
-    ".gitignore", ".streamlit/config.toml", "README.md", "app.py", "demo_app.py", "pyproject.toml",
+    ".gitignore", ".streamlit/config.toml", "LICENSE", "README.md", "app.py", "demo_app.py", "pyproject.toml",
     "requirements.txt", "requirements-test.txt", "src/revenuescope/workspace.css",
     "docs/anomaly_method.md", "docs/architecture.md", "docs/case_study.md", "docs/deployment.md",
     "docs/security_review.md", "docs/upwork_portfolio.md",

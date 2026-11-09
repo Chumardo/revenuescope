@@ -136,6 +136,7 @@ async function verifyCaptionContrast(page) {
 }
 
 async function screenshot(page, file) {
+  if (process.env.REVENUESCOPE_QA_CAPTURE === 'evaluation' && file !== '04-evaluation.png') return;
   await stable(page);
   await page.evaluate(() => document.fonts.ready);
   await page.evaluate(() => {
@@ -178,6 +179,7 @@ function captureErrors(page) {
   page.on('pageerror', error => errors.push(error.message));
   page.on('console', message => {
     if (message.type() === 'error') errors.push(`console: ${message.text()}`);
+    if (message.type() === 'warning') console.log(`Browser warning: ${message.text()}`);
   });
   page.on('response', response => {
     if (response.url().startsWith(appUrl.origin) && response.status() >= 500) {
@@ -289,6 +291,9 @@ async function desktop(browser) {
     await show(exactText(data(page, 'stMetricValue'), '46.67%'));
     await show(exactText(main(page), '7 of 88 alert episodes matched'));
     await show(exactText(main(page), '7 of 15 eligible events detected'));
+    await show(main(page).getByText(/A refund can affect posted-day revenue after its window ends/));
+    await show(main(page).getByText(/An event is eligible when at least one day in its original order-date window was scored/));
+    await show(main(page).getByText(/A zero-day delay means the match fell on the start date/));
   }
   await layout(page);
   await screenshot(page, '04-evaluation.png');
@@ -296,6 +301,10 @@ async function desktop(browser) {
     'Order-day retrospective').click();
   await show(exactText(data(page, 'stMetricValue'), '72'));
   await stable(page);
+  if (stage === 'after') {
+    await show(main(page).getByText(/This comparison uses hindsight/));
+    await show(main(page).getByText(/Both revenue bases use the original order-date event windows/));
+  }
   assert.deepEqual(errors, []);
   await page.close();
   console.log('PASS desktop 1560 × 1080: Overview → filtered/sorted queue → investigation → queue → evaluation');
@@ -327,7 +336,10 @@ async function mobile(browser) {
   await screenshot(page, '07-mobile-investigation.png');
   await navigate(page, screens.evaluation, { touch: true });
   await layout(page);
-  if (stage === 'after') await show(exactText(data(page, 'stMetricValue'), '7.95%'));
+  if (stage === 'after') {
+    await show(exactText(data(page, 'stMetricValue'), '7.95%'));
+    await show(main(page).getByText(/A refund can affect posted-day revenue after its window ends/));
+  }
   await screenshot(page, '08-mobile-evaluation.png');
   if (stage === 'after') {
     const comparison = page.locator('.rs-comparison');

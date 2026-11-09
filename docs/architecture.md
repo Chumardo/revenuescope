@@ -1,6 +1,6 @@
 # RevenueScope architecture
 
-RevenueScope is a local, read-only reporting application over a reproducible e-commerce snapshot. The data generator owns writes; reporting and verification each open the finished DuckDB file read-only. The command line and future dashboard use the same Python analytics API. There is no web service, account system, or external data source in Phase 1.
+RevenueScope is a read-only reporting application over a reproducible e-commerce snapshot. The CLI generates and checks synthetic DuckDB snapshots. The Streamlit demo opens the bundled snapshot read-only and displays Overview, Review Queue, Investigation Detail, and Evaluation pages. The workspace validates bundled evidence for the locked policy. Data generation, verification, and benchmark replay are separate developer commands.
 
 ## Storage model
 
@@ -18,20 +18,20 @@ The database enforces primary and foreign keys, valid statuses, positive sale qu
 ## Query and reporting contracts
 
 1. Rank recognized purchases at order grain across the snapshot before filtering the reporting window. This keeps new/returning definitions stable when users change dates or break results down by segment.
-2. Reduce refunds to one row per sale line at the shared cutoff. Join that result to sale lines and their unique orders/products. This avoids multiplying amounts when a line has several refund events.
-3. Sum integer cent values at the requested grain and count distinct order/customer IDs. AOV, margin, and contribution shares are ratios of aggregate values; they are not averages of subgroup ratios. Only monetary measures are generally additive across product and customer-spanning segments.
+2. For the retrospective order-day view, reduce refunds to one row per sale line at the shared cutoff before joining to orders and products. For posted-day activity, report recognized bookings and refund events on their own dates. Both paths avoid multiplying amounts when a line has several refunds.
+3. Sum integer cent values at the requested grain and count distinct order and customer IDs. Calculate AOV, margin, and contribution shares from aggregate values. Only monetary measures are generally additive across product and customer-spanning segments.
 4. Join daily and monthly reports to explicit calendar spines. Complete zero-activity days remain observations. Incomplete observations are labeled; they cannot drive growth comparisons, anomaly alerts, or a variance bridge.
 5. Return SQL results as pandas frames. The CLI serializes exact monetary totals as integers, undefined values as null, and variance effects as numerator/denominator pairs in cents. A presentation layer can round the effects for display without losing their exact underlying reconciliation.
 
-| Planned module | Phase 1 reporting source | Phase 2 presentation |
+| Analytical capability | Source | Where to use it |
 | --- | --- | --- |
-| Executive Command Center | `analytics.summarize`, `monthly_kpis` | Overall financial KPIs, complete-period trends and denominator explanations. |
-| Revenue Driver Analysis | `variance.compare_periods`, `analytics.summarize` by dimension | Volume/AOV bridge and independently reconciling segment changes. |
-| Anomaly Investigation | `analytics.daily_revenue`, `anomaly.detect_anomalies` | Observed versus expected revenue, historical support and segment investigation. |
-| Customer & Cohort Intelligence | `analytics.customer_cohorts` and customer KPIs | Cohort, repeat-purchase and retention views that distinguish unobserved cells from zero. |
-| Scenario & Decision Lab | Observed KPI and variance baselines | Explicit what-if assumptions and scenario comparisons. No simulation endpoint in Phase 1. |
+| Overall revenue review | `pit.posted_activity`, `analytics.daily_revenue`, `screening.screen` | Streamlit Overview and Review Queue |
+| Flagged-day evidence | `investigation` | Streamlit Investigation Detail with reconciled segment contributions |
+| Held-out screening results | Bundled aggregate evidence, validated by `workspace_evaluation` | Streamlit Evaluation |
+| Period, volume and AOV analysis | `analytics.summarize`, `monthly_kpis`, `variance.compare_periods` | CLI financial report |
+| Customer cohorts and repeat purchases | `analytics.customer_cohorts` and customer KPIs | CLI financial report |
 
-The default CLI report includes no injected-event labels. The verification manifest and evaluator output are developer artifacts. A future public build should exclude both and use only the synthetic database and detector results.
+The default CLI report includes no injected-event labels. The public package includes the synthetic database, investigation evidence, and aggregate evaluation results. The raw verification manifest and detailed evaluator output stay with the developer workflow.
 
 ## Validation and extension points
 

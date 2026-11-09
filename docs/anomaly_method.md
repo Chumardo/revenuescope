@@ -1,8 +1,14 @@
-# Daily revenue anomaly screening
+# Daily revenue screening and benchmark
 
-RevenueScope compares observed net revenue with a baseline fitted on earlier days in the same scope. A scope can be the whole business or an individual segment. A flag gives an analyst a date, a direction, an expected value, and a deviation to investigate. The statistical model cannot identify what caused a deviation.
+RevenueScope compares daily revenue with a weekday baseline. The public Review Queue shows flags for overall revenue. The investigation breaks a flag's gap into segment contributions, while exploratory segment screening remains a developer workflow. A flag gives an analyst a date, a direction, an expected value, and a deviation to investigate. Confirming what caused the deviation requires separate evidence.
 
-## Baseline and alert rule
+## Locked detector in the public workspace
+
+The default posted-day view counts recognized booking value on checkout day and subtracts refunds on the dates they post. The retrospective order-day view applies refunds known at the snapshot cutoff to the original checkout date. A retrospective series can include information that was unavailable on the day being screened. The ledger uses UTC days and integer cents.
+
+The locked policy uses the weekday trend fit described below. It requires eight complete same-weekday references in the prior 12 weeks, activity in at least 65% of those observations, and a historical median of at least eight orders. It excludes known synthetic promotion dates from the reference history and suppresses flags on those dates. A nonzero gap must reach four times the dispersion scale, $1,250, and 25% of the absolute expected amount. The dispersion scale is the greatest of scaled median absolute deviation, $100, and 5% of the absolute expectation.
+
+## Original detector used for comparison
 
 1. Use one UTC calendar day per row, with zero-activity days explicitly represented. Exclude the day being assessed and every incomplete day from training.
 2. Collect observations for the same weekday from the prior 12 calendar weeks. Require at least eight complete observations. This handles weekly patterns while the rolling window limits the effect of older business conditions.
@@ -12,16 +18,18 @@ RevenueScope compares observed net revenue with a baseline fitted on earlier day
 
 The result includes observed integer cents, model diagnostics in floating-point cents, past support counts, the score, and the flag. Incomplete, sparse, and insufficient-history rows retain their observations and an explicit status with a blank score. Thresholds are configurable through `AnomalyConfig` and are fixed before evaluation.
 
-## Verification
+## Frozen held-out benchmark
 
-The detector only consumes the revenue series. A separate evaluator compares alerts with the generator's withheld manifest using each event's date interval, direction, and scope. End dates are exclusive.
+The benchmark scores the overall series on three held-out seeds. It uses the same original order-date event windows and expected directions for both revenue bases. End dates are exclusive. An injected event is eligible for event recall if at least one day in its window was scored. The benchmark reports events outside coverage and events without scored dates separately.
 
-- A true-positive date has an alert in the expected direction within an event's window. A wrong-direction alert is a false positive and leaves the expected date missed. Alerts outside known windows are also false positives for the benchmark.
-- Precision divides matched alerts by alert dates. Recall divides matched alert dates by the number of injected dates that had a score. Unscored injected dates are reported separately. Rates are blank when their denominators are zero.
-- Each event can claim one alert date, and each alert date can credit one event. Within a scope, earliest-ending windows receive first choice of the earliest unused matching alert, with start date and event ID breaking ties. Day-level metrics count overlapping dates once. Event recall considers events with at least one scored date. Events wholly outside coverage or with no scored dates are reported separately.
+- Date precision divides matching dates by alert dates. Date recall divides matching dates by scored dates inside the injected windows. Overlapping dates count once.
+- Consecutive alerts in the same direction form an episode. An event and an episode can match at most once. A match needs an alert date in the expected direction inside the original event window. Event precision divides matches by alert episodes. Event recall divides matches by eligible events.
+- Detection delay counts calendar days from the event window start to the first matched date in the assigned episode. Severity-weighted recall uses the absolute injected revenue change attributed to the original order window. Rates are blank when their denominators are zero.
+
+A refund-driven gap may appear in posted-day revenue after the event's order-date window ends. An episode wholly outside the original window cannot count toward that event's recall, even if the timing aligns with a refund. The locked posted-day result of 7 of 15 eligible events detected and 7 of 88 episodes matched (7.95% event precision) describes this fixed-window benchmark.
 
 ## Interpretation
 
-Holiday promotions, shifts in product mix, and abrupt changes in demand can alert even when they were part of the normal synthetic scenario. The weekly baseline does not model annual holidays, marketing calendars, or exposure to multiple comparisons across segments. Sustained changes can enter the rolling baseline and reduce sensitivity after the first few weeks. Use day-level and event-level metrics together, and treat synthetic benchmark results as a test of this dataset and policy.
+Changes in product mix, demand, or promotions outside the known synthetic calendar can produce flags. Sustained changes can enter the rolling baseline and reduce sensitivity. A benchmark-unmatched date can still merit investigation. The results cover five repeated synthetic event types, so they provide limited evidence about other incidents or merchants. Segment screening would also require accounting for multiple comparisons.
 
-The detector uses only earlier dates in its statistical fit. Because the revenue series attributes refunds known at a common reporting cutoff back to the original order date, a retrospective run can include refund information that arrived after the day being screened. For a true historical backtest, rebuild each date's revenue history using only information available at that day's cutoff.
+A separate evaluation could use posting-date event windows and posted-day counterfactual amounts. That would answer a different question and would need its own protocol and results. A production point-in-time backtest would also need timestamped order status and refund arrival data.

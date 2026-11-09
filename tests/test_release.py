@@ -45,3 +45,36 @@ def test_release_manifest_detects_unapproved_additions(tmp_path):
         package.writestr("output/developer-notes.json", "{}")
     with pytest.raises(ValueError, match="unapproved files"):
         verify_archive(archive)
+
+
+def test_release_includes_license_and_assets_and_rebuilds_byte_for_byte(tmp_path):
+    archive = tmp_path / "release.zip"
+    build_archive(ROOT, archive)
+    verify_archive(archive)
+    extracted = tmp_path / "clean"
+    with ZipFile(archive) as package:
+        package.extractall(extracted)
+    assert (extracted / "LICENSE").read_bytes() == (ROOT / "LICENSE").read_bytes()
+    assert b"[MIT License](LICENSE)" in (extracted / "README.md").read_bytes()
+    assets = extracted / "demo_assets"
+    assert {path.name for path in assets.iterdir()} == {
+        "anomaly-development.json", "anomaly-heldout.json", "anomaly-investigation.json",
+        "anomaly-investigation-retrospective.json", "provenance.json", "revenuescope.duckdb",
+    }
+    for asset in assets.iterdir():
+        assert asset.read_bytes() == (ROOT / "demo_assets" / asset.name).read_bytes()
+    rebuilt = tmp_path / "rebuilt.zip"
+    build_archive(extracted, rebuilt)
+    assert rebuilt.read_bytes() == archive.read_bytes()
+
+
+def test_release_manifest_detects_a_changed_listed_file(tmp_path):
+    archive = tmp_path / "release.zip"
+    build_archive(ROOT, archive)
+    altered = tmp_path / "altered.zip"
+    with ZipFile(archive) as package, ZipFile(altered, "w") as target:
+        for name in package.namelist():
+            content = package.read(name)
+            target.writestr(name, content + b"\nChanged README" if name == "README.md" else content)
+    with pytest.raises(ValueError, match="SHA-256 manifest"):
+        verify_archive(altered)

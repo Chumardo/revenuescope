@@ -146,7 +146,8 @@ def render_overview(data, start, end, *, dimension=None, segment=None):
     with st.container(border=True, key="rs_overview_chart"):
         st.subheader("Daily revenue")
         if not dimension and kpis.scored_days:
-            st.caption(f"{kpis.scored_days:,} of {kpis.calendar_days:,} days scored · {kpis.flagged_days:,} flagged for review · Absolute net deviation {_money(kpis.absolute_deviation_cents)}")
+            st.caption(f"{kpis.scored_days:,} of {kpis.calendar_days:,} days scored · "
+                       f"{kpis.flagged_days:,} flagged for review")
         elif not dimension:
             st.info("Expected revenue is unavailable for the selected dates. See the coverage notes below.")
         last = data.metadata.coverage_end - timedelta(days=1)

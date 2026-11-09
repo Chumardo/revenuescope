@@ -1,6 +1,6 @@
 # RevenueScope security and privacy review
 
-Scope: the synthetic portfolio demo, its source and pinned dependencies, and the local publication boundary. This review covers the prepared project and Streamlit framework settings. A hosted deployment would need its own verification after approval.
+This review covers the synthetic portfolio demo, its source and pinned dependencies, and its local publication boundary. Verify hosted behavior separately from the source and framework settings.
 
 ## Data and runtime boundaries
 
@@ -17,7 +17,7 @@ A local Chrome probe against the clean extracted release found no uploader widge
 
 ## Git and publication boundary
 
-The project directory sits inside a parent workspace repository whose refs and object store contain unrelated material. The public source should be built from a file allowlist in an independent checkout with fresh history. This removes parent refs, the object store, reflogs, configuration, and unrelated workspace files from the publication surface.
+The public source lives in a standalone repository. Build source archives from the explicit file allowlist in that checkout. The archive excludes Git metadata, parent workspace files, and local developer outputs.
 
 The project ignore rules cover environment files, `.streamlit/secrets.toml`, virtual environments, caches, and local generated directories. Those rules are convenience controls. The reviewed release allowlist determines which fixed synthetic runtime artifacts enter the release. Raw audit and replay outputs, verification manifests, temporary fixtures, and build outputs remain local unless the release manifest explicitly lists a required synthetic artifact. A local scan should inspect the actual publication archive, including image metadata and database schema, for the approved file set.
 
@@ -31,6 +31,6 @@ The review queried each exact version's PyPI JSON `vulnerabilities` field on 202
 
 The proposed `setuptools==80.9.0` build pin returned two distinct active advisories. One concerns source distribution exclusions under Unicode normalization. The other concerns path traversal in legacy wheel installation on Windows. The replacement `setuptools==84.2.1` satisfies both patched thresholds and returned an empty advisory array. [Source distribution advisory](https://github.com/advisories/GHSA-h35f-9h28-mq5c) · [Legacy Windows wheel advisory](https://github.com/advisories/GHSA-xmj3-9gf7-h52w) · [Replacement release metadata](https://pypi.org/pypi/setuptools/84.2.1/json)
 
-PyPI lists a non-yanked compatible wheel for all 36 Linux-applicable runtime pins on x86-64 CPython 3.12 with glibc 2.31 or newer. This checks published package metadata. The first hosted build remains the end-to-end Linux installation check.
+At the review date, PyPI listed a non-yanked compatible wheel for all 36 Linux-applicable runtime pins on x86-64 CPython 3.12 with glibc 2.31 or newer. Verify each release's installation in the target environment as well.
 
 The advisory check covers what the selected index published for those versions at review time. Future releases should repeat it against the final lock. Framework routes, hosting limits, session behavior, and operating-system security remain relevant to a public deployment. The demo's fixed synthetic snapshot avoids risks associated with processing private financial data. A private operational adaptation would need its own access, logging, upload, and retention design.

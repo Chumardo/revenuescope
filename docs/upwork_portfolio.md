@@ -4,7 +4,7 @@
 RevenueScope — E-commerce Revenue Investigation Dashboard
 
 **Project description**  
-I built a Streamlit workspace that helps analysts compare daily revenue with a weekday baseline, sort flagged dates by dollar impact, and reconcile the gap across products, regions, and channels. DuckDB and Python keep bookings and posted refunds tied to their event dates and reconcile every breakdown to the cent. The demo uses synthetic data and includes a held-out evaluation that shows the limits of the screening method.
+I built RevenueScope with DuckDB and Streamlit to help analysts decide which revenue gaps to investigate. Compare daily revenue with a weekday baseline, open a flagged date, and break the gap down by product, region, or channel. The default view counts refunds on the day they post. A separate view assigns them to the original order date. The demo uses 731 days of synthetic data. In the held-out test, the detector found 7 of 15 events and matched 7 of 88 alert episodes (7.95% event precision). This is a self-directed portfolio project.
 
 **Role**  
 Data analytics engineering, financial data modeling, dashboard design, and validation for a self-directed portfolio project.
@@ -23,4 +23,4 @@ The workflow turns a flagged revenue day into a prioritized review with comparab
 
 The [Review Queue](screenshots/release/02-review-queue.png) is an optional fourth image showing dollar prioritization and the route into a case. All four images are actual desktop captures of the synthetic workspace.
 
-Use verified repository and demo links after the owner approves publication and the hosted smoke check is complete.
+The [published repository](https://github.com/Chumardo/revenuescope) links to the [live synthetic demo](https://revenuescope-demo.streamlit.app/). Use the repository URL as the portfolio project link.
